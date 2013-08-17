@@ -75,12 +75,12 @@ Pros/Cons
 
 Pros:
 
-* Provides a mechanism to kill a blocked thread
+* Provides a mechanism to kill a blocked thread (thread.Kill())
 * Provides thread status without any logic in the child (thread.Running())
 
 Cons:
 
-* Does not work at all under Windows (although this is untested)
+* Does not implement pthread_cleanup_push/pop
 * Runs in a dedicated thread (most of the time; sometimes this is a pro)
 * Does not integrate with the go scheduler (as a consequence of the new thread)
 * Harder to debug (crashes in C code don't produce stack traces)
