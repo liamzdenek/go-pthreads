@@ -80,6 +80,7 @@ Pros:
 
 Cons:
 
+* Does not work at all under Windows (although this is untested)
 * Runs in a dedicated thread (most of the time; sometimes this is a pro)
 * Does not integrate with the go scheduler (as a consequence of the new thread)
 * Harder to debug (crashes in C code don't produce stack traces)
