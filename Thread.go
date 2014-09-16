@@ -25,6 +25,7 @@ static void register_sig_handler() {
 }
 */
 import "C"
+import "unsafe"
 
 type Thread uintptr
 type ThreadCallback func()
@@ -33,7 +34,7 @@ var create_callback chan ThreadCallback
 
 func init() {
 	C.register_sig_handler()
-	create_callback = make(chan ThreadCallback, 1);
+	create_callback = make(chan ThreadCallback, 1)
 }
 
 //export createThreadCallback
@@ -56,7 +57,7 @@ func Create(cb ThreadCallback) Thread {
 
 	C.createThread(pidptr)
 
-	return Thread(uintptr(pid))
+	return Thread(uintptr(unsafe.Pointer(&pid)))
 }
 
 // determines if the thread is running
@@ -74,5 +75,5 @@ func (t Thread) Kill() {
 
 // helper function to convert the Thread object into a C.pthread_t object
 func (t Thread) c() C.pthread_t {
-	return (C.pthread_t)(t)
+	return *(*C.pthread_t)(unsafe.Pointer(t))
 }
