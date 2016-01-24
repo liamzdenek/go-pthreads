@@ -28,20 +28,27 @@ import "C"
 import "unsafe"
 
 type Thread uintptr
-type ThreadCallback func()
+type ThreadCallback func(args interface{})
 
 var create_callback chan ThreadCallback
+var create_args chan interface{}
+
+// var create_args     chan interface
 
 func init() {
 	C.register_sig_handler()
 	create_callback = make(chan ThreadCallback, 1)
+	create_args = make(chan interface{}, 1)
 }
 
 //export createThreadCallback
 func createThreadCallback() {
 	C.register_sig_handler()
 	C.pthread_setcanceltype(C.PTHREAD_CANCEL_ASYNCHRONOUS, nil)
-	(<-create_callback)()
+	callback := <-create_callback
+	args := <-create_args
+	callback(args)
+
 }
 
 // calls C's sleep function
@@ -50,11 +57,11 @@ func Sleep(seconds uint) {
 }
 
 // initializes a thread using pthread_create
-func Create(cb ThreadCallback) Thread {
+func Create(cb ThreadCallback, args interface{}) Thread {
 	var pid C.pthread_t
 	pidptr := &pid
 	create_callback <- cb
-
+	create_args <- args
 	C.createThread(pidptr)
 
 	return Thread(uintptr(unsafe.Pointer(&pid)))
